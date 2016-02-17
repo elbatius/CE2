@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -12,7 +13,7 @@ public class FileEditor {
 	public FileEditor(String fileName) {
 		_file = new File(fileName);
 		_fileData = new Vector<String>();
-		_fileName = fileName; 
+		_fileName = fileName;
 		checkIfFileExist();
 		retrieveFileData();
 	}
@@ -39,11 +40,26 @@ public class FileEditor {
 		}
 	}
 
+	public void writeToFile(Vector<String> fileData) {
+		_fileData = fileData;
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(_file);
+			for (String phrase : _fileData) {
+				writer.println(phrase);
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public Vector<String> getFileData() {
 		return _fileData;
 	}
-	
-	public String getFileName(){
+
+	public String getFileName() {
 		return _fileName;
 	}
 }
