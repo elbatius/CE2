@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -8,8 +9,11 @@ public class TextBuddy {
 	private static final String MESSAGE_NO_SUCH_COMMAND = "Invalid command. Please key in a valid command.";
 	private static final String MESSAGE_LINE_DELETED = "deleted from %s: \"%s\"";
 	private static final String MESSAGE_PHRASE_ADDED = "added to %s: \"%s\"";
-	private static final String MESSAGE_ARRAY_SORTED = "The array is sorted";
-
+	private static final String MESSAGE_ARRAY_SORTED = "The list is sorted.";
+	private static final String MESSAGE_ZERO_SEARCH_RESULTS = "\"%s\" cannot be found.";
+	private static final String MESSAGE_DISPLAY_SEARCH_RESULTS = "Displaying results containing \"%s\"";
+	private static final String MESSAGE_INVALID_INT_TYPE = "Not a line number. Please enter a valid integer to delete a line.";
+	
 	private static Scanner userInput = new Scanner(System.in);
 
 	public static void main(String[] args) {
@@ -28,65 +32,85 @@ public class TextBuddy {
 	public static void enterCommand(Vector<String> fileData, FileEditor file) {
 		do {
 			System.out.print("command:");
-			String direction = userInput.next();
+			String direction = userInput.next().toLowerCase();
 			executeCommand(direction, fileData, file);
 		} while (true);
 	}
 
 	public static void executeCommand(String direction, Vector<String> fileData, FileEditor file) {
 		switch (direction) {
-		case "display" : {
+		case "display": {
 			displayArray(fileData, file);
 			saveToFile(fileData, file);
 			break;
 		}
-		case "add" : {
+		case "add": {
 			addLine(fileData, file);
 			saveToFile(fileData, file);
 			break;
 		}
-		case "delete" : {
+		case "delete": {
 			deleteLine(fileData, file);
 			saveToFile(fileData, file);
 			break;
 		}
-		case "clear" : {
+		case "clear": {
 			emptyArray(fileData, file);
 			saveToFile(fileData, file);
 			break;
 		}
-		case "sort" : {
+		case "sort": {
 			sortArray(fileData, file);
+			saveToFile(fileData, file);
 			break;
 		}
-		case "exit" : {
+		case "search": {
+			searchArray(fileData);
+			break;
+		}
+		case "exit": {
 			saveToFile(fileData, file);
 			System.exit(0);
 		}
-		default :
+		default:
 			showToUser(MESSAGE_NO_SUCH_COMMAND);
 		}
 	}
-	
-	public static void sortArray(Vector<String> fileData, FileEditor file){
+
+	public static void searchArray(Vector<String> fileData) {
+		String searchPhrase = getPhrase();
+		Vector<String> matchingText = DataModifier.searchForPhrase(fileData, searchPhrase);
+		displayArray(matchingText, searchPhrase);
+	}
+
+	public static void sortArray(Vector<String> fileData, FileEditor file) {
 		fileData = DataModifier.sortArrayAlphabet(fileData);
 		showToUser(MESSAGE_ARRAY_SORTED);
 	}
-	
-	public static void saveToFile(Vector<String> fileData, FileEditor file){
+
+	public static void saveToFile(Vector<String> fileData, FileEditor file) {
 		file.writeToFile(fileData);
 	}
 
 	public static void deleteLine(Vector<String> fileData, FileEditor file) {
 		int lineToBeDeleted = getLine();
-		String phraseToBeDeleted = DataModifier.getPhraseFromArray(fileData, lineToBeDeleted);
-		fileData = DataModifier.deleteFromArray(fileData, lineToBeDeleted);
-		showToUser(String.format(MESSAGE_LINE_DELETED, file.getFileName(), phraseToBeDeleted));
+		if (DataModifier.isExistingLine(fileData, lineToBeDeleted)) {
+			String phraseToBeDeleted = DataModifier.getPhraseFromArray(fileData, lineToBeDeleted);
+			fileData = DataModifier.deleteFromArray(fileData, lineToBeDeleted);
+			showToUser(String.format(MESSAGE_LINE_DELETED, file.getFileName(), phraseToBeDeleted));
+		}
 	}
 
 	public static int getLine() {
-		int deleteLine = userInput.nextInt();
-		return (deleteLine - 1);
+		try {
+			int deleteLine = userInput.nextInt();
+			return (deleteLine - 1);
+		} catch (InputMismatchException s) {
+			showToUser(MESSAGE_INVALID_INT_TYPE);
+			@SuppressWarnings("unused")
+			String trash = userInput.nextLine();
+			return -1;
+		}
 	}
 
 	public static void addLine(Vector<String> fileData, FileEditor file) {
@@ -98,6 +122,15 @@ public class TextBuddy {
 	public static String getPhrase() {
 		String addPhrase = userInput.nextLine();
 		return addPhrase.trim();
+	}
+
+	public static void displayArray(Vector<String> fileData, String Phrase) {
+		if (fileData.isEmpty()) {
+			showToUser(String.format(MESSAGE_ZERO_SEARCH_RESULTS, Phrase));
+		} else {
+			showToUser(String.format(MESSAGE_DISPLAY_SEARCH_RESULTS, Phrase));
+			DataModifier.showFileContent(fileData);
+		}
 	}
 
 	public static void displayArray(Vector<String> fileData, FileEditor file) {
