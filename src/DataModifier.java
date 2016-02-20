@@ -49,7 +49,7 @@ public class DataModifier {
 	
 	//-1 represents a non-integer input by the user.
 	public static boolean isExistingLine(Vector<String> fileData, int lineNum) {
-		if (lineNum == -1) {
+		if (lineNum < 0) {
 			return false;
 		} else if (lineNum < fileData.size()) {
 			return true;
