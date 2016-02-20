@@ -2,6 +2,27 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Vector;
 
+/**
+ * This class is used to take in user commands and display the feedback as per
+ * executed commands. Possible commands are: add <phrase> delete
+ * <phraseNum> display clear search <phrase> sort exit
+ * 
+ * Each line of text will be preceded by the line number of the text. Therefore,
+ * supposing "jumped over the moon" is the first phrase added in In the text
+ * file it reads "1. jumped over the moon" Which is as shown to the user as well
+ * when displayed.
+ * 
+ * Welcome to TextBuddy. mytextfile.txt is ready for use command: add little
+ * brown fox added to mytextfile.txt: "little brown fox" command: display 1.
+ * little brown fox command: add jumped over the moon added to mytextfile.txt:
+ * "jumped over the moon" command: display 1. little brown fox 2. jumped over
+ * the moon command: delete 2 deleted from mytextfile.txt:
+ * "jumped over the moon" command: display 1. little brown fox command: clear
+ * all content deleted from mytextfile.txt command: display mytextfile.txt is
+ * empty command: exit
+ * 
+ * @author Cheng Tze Jin
+ */
 public class TextBuddy {
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %s is ready for use";
 	private static final String MESSAGE_EMPTY_FILE = "%s is empty";
@@ -13,7 +34,7 @@ public class TextBuddy {
 	private static final String MESSAGE_ZERO_SEARCH_RESULTS = "\"%s\" cannot be found.";
 	private static final String MESSAGE_DISPLAY_SEARCH_RESULTS = "Displaying results containing \"%s\"";
 	private static final String MESSAGE_INVALID_INT_TYPE = "Not a line number. Please enter a valid integer to delete a line.";
-	
+
 	private static Scanner userInput = new Scanner(System.in);
 
 	public static void main(String[] args) {
@@ -37,6 +58,16 @@ public class TextBuddy {
 		} while (true);
 	}
 
+	/**
+	 * This method checks which command the user wants to perform: display, add,
+	 * delete, clear or exit. If the user enters none of the aforementioned, a
+	 * message will display to inform the user of an invalid command. Else, when
+	 * a correct command is entered, it will redirect to the associated method
+	 * to perform said command. Any command that changes the data in the file,
+	 * as well as the exit function, will save the edited data to the file.
+	 * Hence, only search will not result in saving to the file, since no change
+	 * has been made to the file.
+	 */
 	public static void executeCommand(String direction, Vector<String> fileData, FileEditor file) {
 		switch (direction) {
 		case "display": {
@@ -101,6 +132,9 @@ public class TextBuddy {
 		}
 	}
 
+	/**Only allows the next input to be a integer. Otherwise, warning message will show
+	 * -1 represents a non-integer input by the user.
+	 */
 	public static int getLine() {
 		try {
 			int deleteLine = userInput.nextInt();
@@ -123,7 +157,8 @@ public class TextBuddy {
 		String addPhrase = userInput.nextLine();
 		return addPhrase.trim();
 	}
-
+	
+	//displays search results, depending on number of results
 	public static void displayArray(Vector<String> fileData, String Phrase) {
 		if (fileData.isEmpty()) {
 			showToUser(String.format(MESSAGE_ZERO_SEARCH_RESULTS, Phrase));

@@ -5,6 +5,12 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.Vector;
 
+/**
+ * This class writes and retrieves data from the text files. text files can only
+ * be accessed through this class, not through the other two classes.
+ * 
+ * @author Cheng Tze Jin
+ */
 public class FileEditor {
 	protected Vector<String> _fileData;
 	protected File _file;
